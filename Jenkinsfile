@@ -67,4 +67,42 @@ pipeline {
             }
         }
     }
+    post {
+        success {
+            withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
+                sh '''
+                curl \
+                -H "Accept: application/json" \
+                -H "Authorization: token ${password}" \
+                -X POST \
+                --data '{"state": "success", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/'${GIT_CONTEXT}'", "description": "success"}' \
+                https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${ORIGIN_COMMIT}
+                '''
+            }
+        }
+        unstable {
+            withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
+                sh '''
+                curl \
+                -H "Accept: application/json" \
+                -H "Authorization: token ${password}" \
+                -X POST \
+                --data '{"state": "failure", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/'${GIT_CONTEXT}'", "description": "unstable"}' \
+                https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${ORIGIN_COMMIT}
+                '''
+            }
+        }
+        failure {
+            withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
+                sh '''
+                curl \
+                -H "Accept: application/json" \
+                -H "Authorization: token ${password}" \
+                -X POST \
+                --data '{"state": "failure", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/'${GIT_CONTEXT}'", "description": "failure"}' \
+                https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${ORIGIN_COMMIT}
+                '''
+            }
+        }
+    }
 }
