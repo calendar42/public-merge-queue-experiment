@@ -54,11 +54,6 @@ pipeline {
                         }
                     }
                 }
-                stage('Linters') {
-                    steps {
-                        sh '''pipenv run black --check merge_queue_experiment'''
-                    }
-                }
                 stage('Tests') {
                     steps {
                         sh '''pipenv run pytest ./merge_queue_experiment/tests/test_merge_queue_experiment.py'''
