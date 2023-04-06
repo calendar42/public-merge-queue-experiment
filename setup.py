@@ -26,6 +26,8 @@ def determine_branch_build_version(build_suffix: str) -> str:
         return base_version
     elif branch.startswith("main"):
         return base_version + "b0" + build_suffix
+    elif branch.startswith("gh-readonly-queue"):
+        return base_version
     else:
         raise ValueError(f"Cannot build for branch '{branch}'")
 
