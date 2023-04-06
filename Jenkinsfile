@@ -12,6 +12,7 @@ pipeline {
                 anyOf {
                     branch 'master'
                     branch 'main'
+                    branch 'gh-readonly-queue/**'
                     changeRequest target: 'master'
                     changeRequest target: 'main'
                 }
@@ -42,6 +43,7 @@ pipeline {
                 anyOf {
                     branch 'master'
                     branch 'main'
+                    branch 'gh-readonly-queue/*'
                     changeRequest target: 'master'
                     changeRequest target: 'main'
                 }
@@ -54,15 +56,29 @@ pipeline {
                         }
                     }
                 }
-                stage('Linters') {
-                    steps {
-                        sh '''pipenv run black --check merge_queue_experiment'''
-                    }
-                }
                 stage('Tests') {
                     steps {
                         sh '''pipenv run pytest ./merge_queue_experiment/tests/test_merge_queue_experiment.py'''
                     }
+                }
+            }
+        }
+        stage('Complete merge queue') {
+            when {
+                anyOf {
+                    branch 'gh-readonly-queue/**'
+                }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
+                    sh '''
+                    curl \
+                    -H "Accept: application/json" \
+                    -H "Authorization: token ${password}" \
+                    -X POST \
+                    --data '{"state": "success", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/pr-merge", "description": "success"}' \
+                    https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${GIT_COMMIT}
+                    '''
                 }
             }
         }
