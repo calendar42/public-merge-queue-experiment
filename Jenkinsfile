@@ -22,7 +22,6 @@ pipeline {
                         sh '''hostname; printenv'''
 
                         script {
-                            gcpArtifact.setPass('${GCPPASS}')
                             if (fileExists('Pipfile.lock')) {
                                 env.PYTHON_VERSION = sh(returnStdout: true, script: 'jq -r "._meta.requires.python_version" Pipfile.lock').trim()
                                 sh "if [ ! -e $HOME/.pyenv/versions/${PYTHON_VERSION} ]; then $HOME/.pyenv/bin/pyenv install ${PYTHON_VERSION}; fi"
@@ -51,17 +50,13 @@ pipeline {
                 stage('Prepare') {
                     steps {
                         script {
-                            withCredentials([string(credentialsId: 'GCP-ARTIFACT-PASS', variable: 'GCPPASS')]) {
-                                gcpArtifact.setPass('${GCPPASS}')
-                                sh '''pipenv run python setup.py develop'''
-                            }
+                            sh '''pipenv run python setup.py develop'''
                         }
                     }
                 }
                 stage('Linters') {
                     steps {
-                        sh '''pipenv run pylint planning_engine'''
-                        sh '''pipenv run black --check planning_engine'''
+                        sh '''pipenv run black --check merge_queue_experiment'''
                     }
                 }
                 stage('Tests') {
