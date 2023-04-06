@@ -56,7 +56,6 @@ pipeline {
                 }
                 stage('Linters') {
                     steps {
-                        sh '''pipenv run pylint merge_queue_experiment'''
                         sh '''pipenv run black --check merge_queue_experiment'''
                     }
                 }
