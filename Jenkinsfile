@@ -19,7 +19,6 @@ pipeline {
             stages {
                 stage('Install python') {
                     steps {
-                        env.ORIGIN_COMMIT = sh(returnStdout: true, script: 'git rev-parse origin/${GIT_BRANCH}').trim()
                         sh '''hostname; printenv'''
 
                         script {
@@ -65,44 +64,6 @@ pipeline {
                         sh '''pipenv run pytest ./merge_queue_experiment/tests/test_merge_queue_experiment.py'''
                     }
                 }
-            }
-        }
-    }
-    post {
-        success {
-            withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
-                sh '''
-                curl \
-                -H "Accept: application/json" \
-                -H "Authorization: token ${password}" \
-                -X POST \
-                --data '{"state": "success", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/'${GIT_CONTEXT}'", "description": "success"}' \
-                https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${ORIGIN_COMMIT}
-                '''
-            }
-        }
-        unstable {
-            withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
-                sh '''
-                curl \
-                -H "Accept: application/json" \
-                -H "Authorization: token ${password}" \
-                -X POST \
-                --data '{"state": "failure", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/'${GIT_CONTEXT}'", "description": "unstable"}' \
-                https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${ORIGIN_COMMIT}
-                '''
-            }
-        }
-        failure {
-            withCredentials([usernamePassword(credentialsId: 'c42-bot token', usernameVariable: 'username', passwordVariable: 'password')]){
-                sh '''
-                curl \
-                -H "Accept: application/json" \
-                -H "Authorization: token ${password}" \
-                -X POST \
-                --data '{"state": "failure", "target_url": "'${RUN_DISPLAY_URL}'", "context": "continuous-integration/jenkins/'${GIT_CONTEXT}'", "description": "failure"}' \
-                https://api.github.com/repos/calendar42/public-merge-queue-experiment/statuses/${ORIGIN_COMMIT}
-                '''
             }
         }
     }
