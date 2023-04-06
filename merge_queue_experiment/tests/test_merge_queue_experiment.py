@@ -8,3 +8,6 @@ class TestMergeQueueExperiment:
 
     def test_false(self):
         assert not False
+
+    def test_not_false_again(self):
+        assert not False
