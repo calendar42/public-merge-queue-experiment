@@ -63,7 +63,7 @@ pipeline {
                 }
             }
         }
-        stage('Prepare') {
+        stage('Complete merge queue') {
             when {
                 anyOf {
                     branch 'gh-readonly-queue/**'
