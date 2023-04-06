@@ -19,6 +19,7 @@ pipeline {
             stages {
                 stage('Install python') {
                     steps {
+                        env.ORIGIN_COMMIT = sh(returnStdout: true, script: 'git rev-parse origin/${GIT_BRANCH}').trim()
                         sh '''hostname; printenv'''
 
                         script {
