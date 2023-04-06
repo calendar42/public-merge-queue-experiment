@@ -12,6 +12,7 @@ pipeline {
                 anyOf {
                     branch 'master'
                     branch 'main'
+                    branch 'gh-readonly-queue/*'
                     changeRequest target: 'master'
                     changeRequest target: 'main'
                 }
@@ -42,6 +43,7 @@ pipeline {
                 anyOf {
                     branch 'master'
                     branch 'main'
+                    branch 'gh-readonly-queue/*'
                     changeRequest target: 'master'
                     changeRequest target: 'main'
                 }
