@@ -3,7 +3,7 @@ import time
 
 class TestMergeQueueExperiment:
     def test_merge_queue_experiment(self):
-        time.sleep(300)
+        time.sleep(250)
         assert True
 
     def test_false(self):
